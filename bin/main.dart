@@ -10,7 +10,7 @@ import '../database/db.dart';
 Future<void> main() async {
   Database database = Database('main.db');
   database.createUsersTable();
-  const BOT_TOKEN = "6447264435:AAGDfkT-_vks2vLXs3y0LqlLNCc0ARYEzm4";
+  const BOT_TOKEN = "8019399131:AAGz6fWt-2D11crBTXz98ghtggHzC0GtWhk";
   final username = (await Telegram(BOT_TOKEN).getMe()).username;
   final teledart = TeleDart(BOT_TOKEN, Event(username!));
 
