@@ -2,28 +2,25 @@
 FROM dart:stable AS build
 WORKDIR /app
 
-# Only copy pubspec to cache dependencies
 COPY pubspec.* ./
 RUN dart pub get
 
-# Copy project files
 COPY . .
+RUN dart pub get
 
-# Compile to native executable
-# Replace bin/main.dart with your actual entrypoint if different
 RUN dart compile exe bin/main.dart -o userinfo_bot
 
-# Stage 2 — Runtime (slim)
+# Stage 2 — Runtime
 FROM debian:bullseye-slim AS run
 WORKDIR /app
 
 RUN apt-get update \
-    && apt-get install -y ca-certificates \
+    && apt-get install -y ca-certificates libsqlite3-0 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /app/userinfo_bot .
+COPY --from=build /app/database ./database
 
-# Expose port (no inline comment!)
 EXPOSE 8080
 
 CMD ["./userinfo_bot"]
