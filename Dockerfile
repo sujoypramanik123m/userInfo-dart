@@ -1,22 +1,20 @@
 # Stage 1 — Build
 FROM dart:stable AS build
-
 WORKDIR /app
 
-# Cache dependencies
+# Only copy pubspec to cache dependencies
 COPY pubspec.* ./
 RUN dart pub get
 
-# Copy source and fetch packages
+# Copy project files
 COPY . .
-RUN dart pub get
 
-# Compile to native executable (adjust path if your bot entrypoint differs)
+# Compile to native executable
+# Replace bin/main.dart with your actual entrypoint if different
 RUN dart compile exe bin/main.dart -o userinfo_bot
 
-# Stage 2 — Runtime
+# Stage 2 — Runtime (slim)
 FROM debian:bullseye-slim AS run
-
 WORKDIR /app
 
 RUN apt-get update \
@@ -25,6 +23,7 @@ RUN apt-get update \
 
 COPY --from=build /app/userinfo_bot .
 
-EXPOSE 8080  # Adjust if your bot listens on a different port
+# Expose port (no inline comment!)
+EXPOSE 8080
 
 CMD ["./userinfo_bot"]
